@@ -1,5 +1,5 @@
 [package]
-name = "command-obfuscator"
+name = "boo"
 version = "0.1.0"
 edition = "2024"
 
@@ -9,6 +9,7 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.104"
+base64 = "0.22"
 thiserror = "2.0.19"
 rand = "0.8"
 clap = { version = "4", features = ["derive"] }

@@ -1,4 +1,4 @@
-use super::{Obfuscate, OS};
+use super::{OS, Obfuscate};
 
 pub struct Pipeline {
     os: OS,
@@ -7,7 +7,10 @@ pub struct Pipeline {
 
 impl Pipeline {
     pub fn new(os: OS) -> Self {
-        Pipeline { os, modules: vec![] }
+        Pipeline {
+            os,
+            modules: vec![],
+        }
     }
 
     pub fn add(mut self, module: impl Obfuscate + 'static) -> Self {
@@ -18,6 +21,8 @@ impl Pipeline {
     pub fn run(&self, command: &str) -> String {
         let mut order: Vec<usize> = (0..self.modules.len()).collect();
         order.sort_by_key(|&i| self.modules[i].module_type().weight());
-        order.iter().fold(command.to_string(), |acc, &i| self.modules[i].apply(&acc, self.os))
+        order.iter().fold(command.to_string(), |acc, &i| {
+            self.modules[i].apply(&acc, self.os)
+        })
     }
 }
