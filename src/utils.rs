@@ -22,8 +22,7 @@ const QUOTED_INNER: &[u8] =
     b"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/()[]|><~^%#@*+=.,:_-? {";
 
 // Final chars — alphanumeric only so the last char before } is never \
-const SAFE_TAIL: &[u8] =
-    b"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const SAFE_TAIL: &[u8] = b"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 /// Builds a multi-segment junk string safe to embed in ${@modifier<JUNK>}.
 /// Combines noise blobs, spaces, "..." pairs, \} escapes, {{{ clusters,

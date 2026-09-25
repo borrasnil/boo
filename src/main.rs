@@ -1,30 +1,29 @@
 use std::io::{self, Read};
 
-use clap::{Parser, ValueEnum};
-use command_obfuscator::modules::command::reverse::ReverseObfuscator;
-use command_obfuscator::modules::string::hex::HexObfuscator;
-use command_obfuscator::modules::string::param::ParamObfuscator;
-use command_obfuscator::modules::string::quotes::QuotesObfuscator;
-use command_obfuscator::{OS, Pipeline};
-
-#[derive(Clone, ValueEnum, Debug)]
-enum Module {
-    Quotes,
-    Hex,
-    Param,
-    Reverse,
-}
+use clap::Parser;
+use command_obfuscator::{AllModules, OS, Pipeline};
 
 #[derive(Parser)]
-#[command(name = "boo", about = "Bash obfuscation tool")]
+#[command(
+    name = "boo",
+    about = "Bash obfuscation tool",
+    long_about = "Bash obfuscation tool with optional EDR evasion modules.\n\n\
+        Default modules: Quotes, Hex, Param (applied with -m or no -m flag).\n\n\
+        EDR evasion modules (opt-in only, must be explicitly requested):\n  \
+          base64   - wraps command in base64-encoded pipe\n  \
+          varindir - splits command across random variables + eval\n  \
+          exec     - wraps command in exec bash -c (process mask)\n  \
+          heredoc  - wraps command in a bash heredoc"
+)]
 struct Args {
     /// Command to obfuscate (reads from stdin if omitted)
     #[arg(short, long)]
     command: Option<String>,
 
-    /// Modules to apply in order (default: param,quotes)
+    /// Modules to apply (default: Quotes,Hex,Param).
+    /// Add EDR evasion: -m base64,varindir,exec,heredoc
     #[arg(short, long, value_enum, num_args = 1.., value_delimiter = ',')]
-    module: Option<Vec<Module>>,
+    module: Option<Vec<AllModules>>,
 }
 
 fn main() {
@@ -41,27 +40,12 @@ fn main() {
         }
     };
 
-    let modules: Vec<Module> = args
-        .module
-        .unwrap_or_else(|| vec![Module::Param, Module::Quotes]);
+    let modules: Vec<AllModules> = args.module.unwrap_or_else(AllModules::all);
 
     let mut pipeline = Pipeline::new(OS::Linux);
     for m in modules {
-        match m {
-            Module::Quotes => {
-                pipeline = pipeline.add(QuotesObfuscator);
-            }
-            Module::Hex => {
-                pipeline = pipeline.add(HexObfuscator);
-            }
-            Module::Param => {
-                pipeline = pipeline.add(ParamObfuscator);
-            }
-            Module::Reverse => {
-                pipeline = pipeline.add(ReverseObfuscator);
-            }
-        }
+        pipeline = pipeline.add(m);
     }
 
-    println!("{}", pipeline.run(&command));
+    println!(r##"{}"##, pipeline.run(&command));
 }

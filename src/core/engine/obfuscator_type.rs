@@ -3,6 +3,7 @@ pub enum ObfuscatorType {
     CommandObfuscator,
     Compressor,
     Encoder,
+    EvasionModule,
     NoiseInjector,
     StringObfuscator,
     TokenObfuscator,
@@ -11,7 +12,7 @@ pub enum ObfuscatorType {
 
 impl ObfuscatorType {
     /// Execution order: lower weight runs first.
-    /// StringObfuscator/Encoder (1) → NoiseInjector (2) → CommandObfuscator (3)
+    /// StringObfuscator/Encoder (1) → NoiseInjector (2) → CommandObfuscator/EvasionModule (3)
     pub fn weight(self) -> u8 {
         match self {
             ObfuscatorType::Encoder => 1,
@@ -20,6 +21,7 @@ impl ObfuscatorType {
             ObfuscatorType::NoiseInjector => 2,
             ObfuscatorType::Compressor => 2,
             ObfuscatorType::CommandObfuscator => 3,
+            ObfuscatorType::EvasionModule => 3,
             ObfuscatorType::InterpreterWrapper => 4,
         }
     }

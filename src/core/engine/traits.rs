@@ -1,4 +1,4 @@
-use super::{ObfuscatorType, OS};
+use super::{OS, ObfuscatorType};
 
 pub trait Obfuscate {
     fn apply(&self, command: &str, os: OS) -> String;
